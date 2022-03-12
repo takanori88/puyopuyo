@@ -21,7 +21,7 @@ class Player {
           this.keyStatus.right = true
           e.preventDefault()
           return false
-        case 40
+        case 40:
           this.keyStatus.down = true
           e.preventDefault()
           return false
@@ -317,5 +317,53 @@ class Player {
       }
     }
     return "playing"
+  }
+
+  static moving(frame) {
+    this.falling()
+    const ratio = Math.min(1, (frame - this.actionStartFrame) / Config.playerMoveFrame)
+    this.puyoStatus.left = ratio * (this.moveDestination - this.moveSource) + this.moveSource
+    this.setPuyoPosition()
+    return ratio !== 1;
+  }
+
+  static rotating(frame) {
+    this.falling()
+    const ratio = Math.min(1, (frame - this.actionStartFrame) / Config.playerRotateFrame)
+    this.puyoStatus.left = (this.rotateAfeterLeft - this.rotateBeforeLeft) * ratio + this.rotateBeforeLeft
+    this.puyoStatus.rotation = this.rotateFromRotation + ratio * 90
+    this.setPuyoPosition()
+    if (ratio === 1) {
+      this.puyoStatus.rotation = (this.rotateFromRotation + 90) % 360
+      return false
+    }
+    return true
+  }
+
+  static fix() {
+    const x = this.puyoStatus.x
+    const y = this.puyoStatus.y
+    const dx = this.puyoStatus.dx
+    const dy = this.puyoStatus.dy
+    if (y > 0) {
+      Stage.setPuyo(x, y, this.centerPuyo)
+      Stage.puyoCount++
+    }
+
+    if (y + dy >= 0) {
+      Stage.setPuyo(x + dx, y + dy, this.movablePuyo)
+      Stage.puyoCount++
+    }
+
+    Stage.stageElement.removeChild(this.centerPuyoElement)
+    Stage.stageElement.removeChild(this.movablePuyoElement)
+    this.centerPuyoElement = null
+    this.movablePuyoElement = null
+  }
+
+  static batankyu() {
+    if (this.keyStatus.up) {
+      location.reload()
+    }
   }
 }
