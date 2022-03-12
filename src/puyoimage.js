@@ -1,4 +1,4 @@
-class Puyoimage {
+class PuyoImage {
   static initialize() {
     this.puyoImages = []
     for(let i = 0; i < 5; i++) {
